@@ -23,6 +23,30 @@ int BinaryExpressionBuilder::precedence(char op)
     }
 }
 
+void BinaryExpressionBuilder::processOperator(char op)
+{
+    int opPrecedence = precedence(op);
+    while ((!operatorStack.empty()) && (opPrecedence <= precedence(operatorStack.top())))
+    {
+        doBinary( operatorStack.top());
+        operatorStack.pop();
+    }
+
+    operatorStack.push(op);
+}
+
+void BinaryExpressionBuilder::doBinary(char op)
+{
+    ExpressionElementNode *right = operandStack.top();
+    operandStack.pop();
+
+    ExpressionElementNode *left = operandStack.top();
+    operandStack.pop();
+
+    ExpressionElementNode *p= new ExpressionElementNode(operatorStack.top(), left, right);
+    operandStack.push(p);
+}
+
 ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(NotWellFormed)
 {
     istringstream istr(str);
@@ -82,18 +106,6 @@ ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(No
     return p;
 }
 
-void BinaryExpressionBuilder::processOperator(char op)
-{
-    int opPrecedence = precedence(op);
-    while ((!operatorStack.empty()) && (opPrecedence <= precedence(operatorStack.top())))
-    {
-        doBinary( operatorStack.top());
-        operatorStack.pop();
-    }
-
-    operatorStack.push(op);
-}
-
 void BinaryExpressionBuilder::processRightParenthesis()
 {
     while (!operatorStack.empty() && operatorStack.top()!= '(')
@@ -103,18 +115,6 @@ void BinaryExpressionBuilder::processRightParenthesis()
     }
 
     operatorStack.pop();
-}
-
-void BinaryExpressionBuilder::doBinary(char op)
-{
-    ExpressionElementNode *right = operandStack.top();
-    operandStack.pop();
-
-    ExpressionElementNode *left = operandStack.top();
-    operandStack.pop();
-
-    ExpressionElementNode *p= new ExpressionElementNode(operatorStack.top(), left, right);
-    operandStack.push(p);
 }
 
 double BinaryExpressionBuilder::calculate(ExpressionElementNode* root, double variableValue)
