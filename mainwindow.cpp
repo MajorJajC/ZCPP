@@ -42,8 +42,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QTreeWidgetItem* convertTree(QTreeWidget* tree, ExpressionElementNode* root, QTreeWidgetItem *parent) {
-    if(root->left != 0 && root->right != 0) {
+QTreeWidgetItem* convertTree(QTreeWidget* tree, ExpressionElementNode* root, QTreeWidgetItem *parent)
+{
+    if(root->left != 0 && root->right != 0)
+    {
         QTreeWidgetItem *left = new QTreeWidgetItem(), *right = new QTreeWidgetItem();
         left = convertTree(tree, root->left, left);
         right = convertTree(tree, root->right, right);
@@ -51,19 +53,28 @@ QTreeWidgetItem* convertTree(QTreeWidget* tree, ExpressionElementNode* root, QTr
         parent->setText(0, toString(root->binary_op));
         parent->addChild(left);
         parent->addChild(right);
-    } else if(root->left == 0 && root->right == 0) {
-        if(root->variable != NULL) {
+    }
+    else if(root->left == 0 && root->right == 0)
+    {
+        if(root->variable != NULL)
+        {
             parent->setText(0, toString(root->variable));
-        } else {
+        }
+        else
+        {
             parent->setText(0, toString(root->number));
         }
-    } else if(root->left == 0) {
+    }
+    else if(root->left == 0)
+    {
         QTreeWidgetItem *right = new QTreeWidgetItem();
         right = convertTree(tree, root->right, right);
 
         parent->setText(0, toString(root->binary_op));
         parent->addChild(right);
-    } else if(root->right == 0) {
+    }
+    else if(root->right == 0)
+    {
         QTreeWidgetItem *left = new QTreeWidgetItem();
         left = convertTree(tree, root->left, left);
 
@@ -73,7 +84,8 @@ QTreeWidgetItem* convertTree(QTreeWidget* tree, ExpressionElementNode* root, QTr
     return parent;
 }
 
-void MainWindow::updateTree(string exp) {
+void MainWindow::updateTree(string exp)
+{
     exp = delSpaces(exp);
     BinaryExpressionBuilder b;
     ExpressionElementNode* root;
@@ -105,12 +117,14 @@ void MainWindow::on_calc_clicked()
 
 void MainWindow::on_drawPlot_clicked()
 {
-    try {
+    try
+    {
         double from = ui->from->value();
         double to = ui->to->value();
         double step =  ui->step->value();
 
-        if(from > to) {
+        if(from > to)
+        {
             double temp = to;
             to = from;
             from = temp;
@@ -119,7 +133,8 @@ void MainWindow::on_drawPlot_clicked()
             ui->to->setValue(to);
         }
 
-        if(step == 0) {
+        if(step == 0)
+        {
             step = 1;
             ui->step->setValue(1.0);
         }
@@ -194,7 +209,7 @@ void MainWindow::on_save_clicked()
 
 void MainWindow::on_Wczytaj_clicked()
 {
-    QString filename = QFileDialog::getOpenFileName( ui->centralWidget, "Wczytaj plik", "", "" );
+    QString filename = QFileDialog::getOpenFileName(ui->centralWidget, "Wczytaj plik", "", "" );
     QFile f( filename );
     f.open( QIODevice::ReadOnly );
     QTextStream inStream(&f);

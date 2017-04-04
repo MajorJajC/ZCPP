@@ -6,10 +6,9 @@ using namespace std;
 
 int BinaryExpressionBuilder::precedence(char op)
 {
-    enum { lowest, mid, highest };
-
-    switch (op) {
-
+    enum {low, mid, hi};
+    switch (op)
+    {
         case '+':
         case '-':
             return mid;
@@ -17,10 +16,10 @@ int BinaryExpressionBuilder::precedence(char op)
         case '/':
         case '*':
         case '^':
-            return highest;
+            return hi;
 
         default:
-            return lowest;
+            return low;
     }
 }
 
@@ -28,67 +27,67 @@ ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(No
 {
     istringstream istr(str);
     char token;
+    while (istr >> token)
+    {
+        switch (token)
+        {
+            case '+':
+            case '-':
+            case '*':
+            case '^':
+            case '/':
+                processOperator(token);
+                break;
 
-    while (istr >> token) {
+            case ')':
+                processRightParenthesis();
+                break;
 
-        switch (token) {
+            case '(':
+                operatorStack.push(token);
+                break;
 
-                case '+':
-                case '-':
-                case '*':
-                case '^':
-                case '/':
-                        processOperator(token);
-                        break;
+            case 'x':
+            {
+                ExpressionElementNode *variable = new ExpressionElementNode(token);
+                operandStack.push(variable);
+                break;
+            }
 
-                case ')':
-                        processRightParenthesis();
-                        break;
+            default:
+                istr.putback (token);
+                double number;
 
-                case '(':
-                        operatorStack.push(token);
-                        break;
-                case 'x': {
-                        ExpressionElementNode *variable = new ExpressionElementNode(token);
-                        operandStack.push(variable);
-                        break;
-                }
-                default:
-                        istr.putback (token);
-                        double number;
+                istr >> number;
 
-                        istr >> number;
+                ExpressionElementNode *newNode = new ExpressionElementNode(number);
+                operandStack.push(newNode);
 
-                        ExpressionElementNode *newNode = new ExpressionElementNode(number);
-                        operandStack.push(newNode);
-
-                        continue;
+                continue;
         }
     }
 
-    while (!operatorStack.empty()) {
-
-        doBinary( operatorStack.top() );
+    while (!operatorStack.empty())
+    {
+        doBinary(operatorStack.top());
         operatorStack.pop();
     }
 
-    if ( operandStack.size()  != 1) {
-
+    if (operandStack.size()!=1)
+    {
         throw NotWellFormed();
     }
 
     ExpressionElementNode *p = operandStack.top();
-
     return p;
 }
 
 void BinaryExpressionBuilder::processOperator(char op)
 {
     int opPrecedence = precedence(op);
-
-    while ((!operatorStack.empty()) && (opPrecedence <= precedence( operatorStack.top() ) ) )  {
-
-        doBinary( operatorStack.top() );
+    while ((!operatorStack.empty()) && (opPrecedence <= precedence(operatorStack.top())))
+    {
+        doBinary( operatorStack.top());
         operatorStack.pop();
     }
 
@@ -97,9 +96,9 @@ void BinaryExpressionBuilder::processOperator(char op)
 
 void BinaryExpressionBuilder::processRightParenthesis()
 {
-    while (!operatorStack.empty() && operatorStack.top() != '(' ) {
-
-        doBinary( operatorStack.top() );
+    while (!operatorStack.empty() && operatorStack.top()!= '(')
+    {
+        doBinary(operatorStack.top());
         operatorStack.pop();
     }
 
@@ -109,53 +108,66 @@ void BinaryExpressionBuilder::processRightParenthesis()
 void BinaryExpressionBuilder::doBinary(char op)
 {
     ExpressionElementNode *right = operandStack.top();
-
     operandStack.pop();
 
     ExpressionElementNode *left = operandStack.top();
-
     operandStack.pop();
 
     ExpressionElementNode *p= new ExpressionElementNode(operatorStack.top(), left, right);
-
     operandStack.push(p);
 }
 
-double BinaryExpressionBuilder::calculate(ExpressionElementNode* root, double variableValue) {
+double BinaryExpressionBuilder::calculate(ExpressionElementNode* root, double variableValue)
+{
     double left, right, result;
-    if(root->left != 0 && root->right != 0) {
+    if(root->left != 0 && root->right != 0)
+    {
         left = calculate(root->left, variableValue);
         right = calculate(root->right, variableValue);
-    } else if(root->left == 0 && root->right == 0) {
-        if(root->variable) {
+    }
+
+    else if(root->left == 0 && root->right == 0)
+    {
+        if(root->variable)
+        {
             return variableValue;
-        } else {
+        }
+
+        else
+        {
             return root->number;
         }
-    } else if(root->left == 0) {
+    }
+
+    else if(root->left == 0)
+    {
         left = root->number;
         right = calculate(root->right, variableValue);
+    }
 
-    } else if(root->right == 0) {
+    else if(root->right == 0)
+    {
         left = calculate(root->left, variableValue);
         right = root->number;
     }
 
-    switch ( root->binary_op ) {
+    switch ( root->binary_op )
+    {
         case '+':  result = left + right;
-                   break;
+        break;
 
         case '-':  result = left - right;
-                   break;
+        break;
 
         case '*':  result = left * right;
-                   break;
+        break;
 
         case '/':  result = left / right;
-                   break;
+        break;
 
         case '^':  result = pow(left, right);
-                   break;
+        break;
     }
+
     return result;
 }

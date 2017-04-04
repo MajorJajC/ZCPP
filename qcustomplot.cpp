@@ -25,8 +25,6 @@
 
 #include "qcustomplot.h"
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////// QCPPainter
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,6 +45,7 @@
 /*!
   Creates a new QCPPainter instance and sets default values
 */
+
 QCPPainter::QCPPainter() :
   QPainter(),
   mModes(pmDefault),
@@ -62,6 +61,7 @@ QCPPainter::QCPPainter() :
   
   Like \ref begin, this method sets QPainter::NonCosmeticDefaultPen in Qt versions before Qt5.
 */
+
 QCPPainter::QCPPainter(QPaintDevice *device) :
   QPainter(device),
   mModes(pmDefault),
@@ -83,6 +83,7 @@ QCPPainter::~QCPPainter()
   
   \note this function hides the non-virtual base class implementation.
 */
+
 void QCPPainter::setPen(const QPen &pen)
 {
   QPainter::setPen(pen);
@@ -90,13 +91,13 @@ void QCPPainter::setPen(const QPen &pen)
     makeNonCosmetic();
 }
 
-/*! \overload
-  
+/*! \overload 
   Sets the pen (by color) of the painter and applies certain fixes to it, depending on the mode of
   this QCPPainter.
   
   \note this function hides the non-virtual base class implementation.
 */
+
 void QCPPainter::setPen(const QColor &color)
 {
   QPainter::setPen(color);
@@ -105,12 +106,12 @@ void QCPPainter::setPen(const QColor &color)
 }
 
 /*! \overload
-  
   Sets the pen (by style) of the painter and applies certain fixes to it, depending on the mode of
   this QCPPainter.
   
   \note this function hides the non-virtual base class implementation.
 */
+
 void QCPPainter::setPen(Qt::PenStyle penStyle)
 {
   QPainter::setPen(penStyle);
@@ -119,13 +120,13 @@ void QCPPainter::setPen(Qt::PenStyle penStyle)
 }
 
 /*! \overload
-  
   Works around a Qt bug introduced with Qt 4.8 which makes drawing QLineF unpredictable when
   antialiasing is disabled. Thus when antialiasing is disabled, it rounds the \a line to
   integer coordinates and then passes it to the original drawLine.
   
   \note this function hides the non-virtual base class implementation.
 */
+
 void QCPPainter::drawLine(const QLineF &line)
 {
   if (mIsAntialiasing || mModes.testFlag(pmVectorized))
@@ -140,6 +141,7 @@ void QCPPainter::drawLine(const QLineF &line)
   antialiased and non-antialiased painting (Since Qt < 5.0 uses slightly different coordinate systems for
   AA/Non-AA painting).
 */
+
 void QCPPainter::setAntialiasing(bool enabled)
 {
   setRenderHint(QPainter::Antialiasing, enabled);
@@ -160,6 +162,7 @@ void QCPPainter::setAntialiasing(bool enabled)
   Sets the mode of the painter. This controls whether the painter shall adjust its
   fixes/workarounds optimized for certain output devices.
 */
+
 void QCPPainter::setModes(QCPPainter::PainterModes modes)
 {
   mModes = modes;
@@ -176,6 +179,7 @@ void QCPPainter::setModes(QCPPainter::PainterModes modes)
   
   \note this function hides the non-virtual base class implementation.
 */
+
 bool QCPPainter::begin(QPaintDevice *device)
 {
   bool result = QPainter::begin(device);
@@ -186,11 +190,11 @@ bool QCPPainter::begin(QPaintDevice *device)
   return result;
 }
 
-/*! \overload
-  
+/*! \overload 
   Sets the mode of the painter. This controls whether the painter shall adjust its
   fixes/workarounds optimized for certain output devices.
 */
+
 void QCPPainter::setMode(QCPPainter::PainterMode mode, bool enabled)
 {
   if (!enabled && mModes.testFlag(mode))
@@ -207,6 +211,7 @@ void QCPPainter::setMode(QCPPainter::PainterMode mode, bool enabled)
   
   \see restore
 */
+
 void QCPPainter::save()
 {
   mAntialiasingStack.push(mIsAntialiasing);
@@ -221,6 +226,7 @@ void QCPPainter::save()
   
   \see save
 */
+
 void QCPPainter::restore()
 {
   if (!mAntialiasingStack.isEmpty())
@@ -234,6 +240,7 @@ void QCPPainter::restore()
   Changes the pen width to 1 if it currently is 0. This function is called in the \ref setPen
   overrides when the \ref pmNonCosmetic mode is set.
 */
+
 void QCPPainter::makeNonCosmetic()
 {
   if (qFuzzyIsNull(pen().widthF()))
@@ -328,6 +335,7 @@ void QCPPainter::makeNonCosmetic()
   Since the pen is undefined (\ref isPenDefined returns false), the scatter color will be inherited
   from the plottable that uses this scatter style.
 */
+
 QCPScatterStyle::QCPScatterStyle() :
   mSize(6),
   mShape(ssNone),
@@ -344,6 +352,7 @@ QCPScatterStyle::QCPScatterStyle() :
   Since the pen is undefined (\ref isPenDefined returns false), the scatter color will be inherited
   from the plottable that uses this scatter style.
 */
+
 QCPScatterStyle::QCPScatterStyle(ScatterShape shape, double size) :
   mSize(size),
   mShape(shape),
@@ -357,6 +366,7 @@ QCPScatterStyle::QCPScatterStyle(ScatterShape shape, double size) :
   Creates a new QCPScatterStyle instance with shape set to \a shape, the pen color set to \a color,
   and size to \a size. No brush is defined, i.e. the scatter point will not be filled.
 */
+
 QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, double size) :
   mSize(size),
   mShape(shape),
@@ -370,6 +380,7 @@ QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, double
   Creates a new QCPScatterStyle instance with shape set to \a shape, the pen color set to \a color,
   the brush color to \a fill (with a solid pattern), and size to \a size.
 */
+
 QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, const QColor &fill, double size) :
   mSize(size),
   mShape(shape),
@@ -394,6 +405,7 @@ QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QColor &color, const 
   instead of just <tt>Qt::blue</tt>, to clearly point out to the compiler that this constructor is
   wanted.
 */
+
 QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QPen &pen, const QBrush &brush, double size) :
   mSize(size),
   mShape(shape),
@@ -407,6 +419,7 @@ QCPScatterStyle::QCPScatterStyle(ScatterShape shape, const QPen &pen, const QBru
   Creates a new QCPScatterStyle instance which will show the specified \a pixmap. The scatter shape
   is set to \ref ssPixmap.
 */
+
 QCPScatterStyle::QCPScatterStyle(const QPixmap &pixmap) :
   mSize(5),
   mShape(ssPixmap),
@@ -426,6 +439,7 @@ QCPScatterStyle::QCPScatterStyle(const QPixmap &pixmap) :
   factor of \a size/6.0. Since the default \a size is 6, the custom path will appear at a its
   natural size by default. To double the size of the path for example, set \a size to 12.
 */
+
 QCPScatterStyle::QCPScatterStyle(const QPainterPath &customPath, const QPen &pen, const QBrush &brush, double size) :
   mSize(size),
   mShape(ssCustom),
