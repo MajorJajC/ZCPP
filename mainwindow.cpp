@@ -89,7 +89,7 @@ void MainWindow::updateTree(string exp)
     exp = delSpaces(exp);
     BinaryExpressionBuilder b;
     ExpressionElementNode* root;
-    root = b.parse(exp);
+    root = b.parsujDzialanie(exp);
     QTreeWidgetItem* item = new QTreeWidgetItem(ui->onpTree);
 
     item = convertTree(ui->onpTree, root, item);
@@ -146,7 +146,7 @@ void MainWindow::on_drawPlot_clicked()
         exp = delSpaces(exp);
         BinaryExpressionBuilder b;
         ExpressionElementNode* root;
-        root = b.parse(exp);
+        root = b.parsujDzialanie(exp);
 
         QStandardItemModel *model = new QStandardItemModel();
 
@@ -159,7 +159,7 @@ void MainWindow::on_drawPlot_clicked()
 
         for(int row = 0; row < items; row++)
         {
-            double value = b.calculate(root, x);
+            double value = b.oblicz(root, x);
             QModelIndex indexKey = model->index(row,0,QModelIndex());
             model->setData(indexKey,x);
 
@@ -200,23 +200,23 @@ void MainWindow::on_close_clicked()
 void MainWindow::on_save_clicked()
 {
     QString filename = QFileDialog::getSaveFileName( ui->centralWidget, "Zapisz plik", "", "" );
-    QFile f( filename );
-    f.open( QIODevice::WriteOnly );
-    QTextStream outStream(&f);
+    QFile file(filename);
+    file.open( QIODevice::WriteOnly );
+    QTextStream outStream(&file);
     outStream << ui->function->text();
-    f.close();
+    file.close();
 }
 
 void MainWindow::on_Wczytaj_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(ui->centralWidget, "Wczytaj plik", "", "" );
-    QFile f( filename );
-    f.open( QIODevice::ReadOnly );
-    QTextStream inStream(&f);
+    QFile file(filename);
+    file.open(QIODevice::ReadOnly);
+    QTextStream inStream(&file);
     QString s;
     s = inStream.readAll();
     ui->function->setText(s);
-    f.close();
+    file.close();
 
     ui->calc->click();
     ui->drawPlot->click();

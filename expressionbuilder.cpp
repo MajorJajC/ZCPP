@@ -4,50 +4,52 @@
 
 using namespace std;
 
-int BinaryExpressionBuilder::precedence(char op)
+int BinaryExpressionBuilder::kolejnoscDzialan(char op)
 {
-    enum {low, mid, hi};
+    enum {zero, low, mid, hi};
     switch (op)
     {
+        default:
+            return zero;
+
         case '+':
         case '-':
-            return mid;
+            return low;
 
         case '/':
         case '*':
+            return mid;
+
         case '^':
             return hi;
-
-        default:
-            return low;
     }
 }
 
-void BinaryExpressionBuilder::processOperator(char op)
+void BinaryExpressionBuilder::przetworzDzialanie(char op)
 {
-    int opPrecedence = precedence(op);
-    while ((!operatorStack.empty()) && (opPrecedence <= precedence(operatorStack.top())))
+    int opKolejnosc = kolejnoscDzialan(op);
+    while ((!operatorStack.empty()) && (opKolejnosc <= kolejnoscDzialan(operatorStack.top())))
     {
-        doBinary( operatorStack.top());
+        tworzDrzewo(operatorStack.top());
         operatorStack.pop();
     }
 
     operatorStack.push(op);
 }
 
-void BinaryExpressionBuilder::doBinary(char op)
+void BinaryExpressionBuilder::tworzDrzewo(char op)
 {
-    ExpressionElementNode *right = operandStack.top();
+    ExpressionElementNode *prawy = operandStack.top();
     operandStack.pop();
 
-    ExpressionElementNode *left = operandStack.top();
+    ExpressionElementNode *lewy = operandStack.top();
     operandStack.pop();
 
-    ExpressionElementNode *p= new ExpressionElementNode(operatorStack.top(), left, right);
+    ExpressionElementNode *p= new ExpressionElementNode(operatorStack.top(), lewy, prawy);
     operandStack.push(p);
 }
 
-ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(NotWellFormed)
+ExpressionElementNode *BinaryExpressionBuilder::parsujDzialanie(std::string& str) throw(NotWellFormed)
 {
     istringstream istr(str);
     char token;
@@ -60,11 +62,11 @@ ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(No
             case '*':
             case '^':
             case '/':
-                processOperator(token);
+                przetworzDzialanie(token);
                 break;
 
             case ')':
-                processRightParenthesis();
+                przetworzPrawyNawias();
                 break;
 
             case '(':
@@ -93,7 +95,7 @@ ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(No
 
     while (!operatorStack.empty())
     {
-        doBinary(operatorStack.top());
+        tworzDrzewo(operatorStack.top());
         operatorStack.pop();
     }
 
@@ -106,24 +108,24 @@ ExpressionElementNode *BinaryExpressionBuilder::parse(std::string& str) throw(No
     return p;
 }
 
-void BinaryExpressionBuilder::processRightParenthesis()
+void BinaryExpressionBuilder::przetworzPrawyNawias()
 {
     while (!operatorStack.empty() && operatorStack.top()!= '(')
     {
-        doBinary(operatorStack.top());
+        tworzDrzewo(operatorStack.top());
         operatorStack.pop();
     }
 
     operatorStack.pop();
 }
 
-double BinaryExpressionBuilder::calculate(ExpressionElementNode* root, double variableValue)
+double BinaryExpressionBuilder::oblicz(ExpressionElementNode* root, double variableValue)
 {
-    double left, right, result;
+    double lewy, prawy, wynik;
     if(root->left != 0 && root->right != 0)
     {
-        left = calculate(root->left, variableValue);
-        right = calculate(root->right, variableValue);
+        lewy = oblicz(root->left, variableValue);
+        prawy = oblicz(root->right, variableValue);
     }
 
     else if(root->left == 0 && root->right == 0)
@@ -141,33 +143,33 @@ double BinaryExpressionBuilder::calculate(ExpressionElementNode* root, double va
 
     else if(root->left == 0)
     {
-        left = root->number;
-        right = calculate(root->right, variableValue);
+        lewy = root->number;
+        prawy = oblicz(root->right, variableValue);
     }
 
     else if(root->right == 0)
     {
-        left = calculate(root->left, variableValue);
-        right = root->number;
+        lewy = oblicz(root->left, variableValue);
+        prawy = root->number;
     }
 
     switch ( root->binary_op )
     {
-        case '+':  result = left + right;
+        case '+':  wynik = lewy + prawy;
         break;
 
-        case '-':  result = left - right;
+        case '-':  wynik = lewy - prawy;
         break;
 
-        case '*':  result = left * right;
+        case '*':  wynik = lewy * prawy;
         break;
 
-        case '/':  result = left / right;
+        case '/':  wynik = lewy / prawy;
         break;
 
-        case '^':  result = pow(left, right);
+        case '^':  wynik = pow(lewy, prawy);
         break;
     }
 
-    return result;
+    return wynik;
 }

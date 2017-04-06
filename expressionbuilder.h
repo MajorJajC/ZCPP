@@ -4,8 +4,8 @@
 
 class ExpressionElementNode;
 
-class BinaryExpressionBuilder {
-
+class BinaryExpressionBuilder
+{
    private:
      // holds either (, +, -, /, or *
      std::stack<char> operatorStack;
@@ -13,12 +13,12 @@ class BinaryExpressionBuilder {
      // operandStack is made up of BinaryOperationNodes and NumericElementNode
      std::stack<ExpressionElementNode *> operandStack;
 
-     void processOperator(char op);
-     void processRightParenthesis();
+     void przetworzDzialanie(char op);
+     void przetworzPrawyNawias();
 
-     void doBinary(char op);
+     void tworzDrzewo(char op);
 
-     int precedence(char op);
+     int kolejnoscDzialan(char op);
 
    public:
      class NotWellFormed : public std::exception {
@@ -30,6 +30,6 @@ class BinaryExpressionBuilder {
           }
       };
 
-     ExpressionElementNode *parse(std::string& istr) throw(NotWellFormed);
-     double calculate(ExpressionElementNode* root, double variableValue);
+     ExpressionElementNode *parsujDzialanie(std::string& istr) throw(NotWellFormed);
+     double oblicz(ExpressionElementNode* root, double variableValue);
 };
